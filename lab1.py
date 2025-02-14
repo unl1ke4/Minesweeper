@@ -8,7 +8,6 @@ class MainPage:
         # Налаштування вікна
         self.screen = pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Minesweeper")
-        
         self.background = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/fon.png").convert()
 
         # Шрифти
@@ -16,13 +15,11 @@ class MainPage:
         self.small_font = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Regular.ttf", 28)
         self.table = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Bold.ttf", 16)
         
-        # Кнопки
-        
-        self.records_button = pygame.Rect(227, 250, 150, 40)
-        
-        self.icon = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Start.png").convert_alpha()
-        self.icon = pygame.transform.scale(self.icon, (150, 75))
-
+        # Кнопки               
+        self.start = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Start.png").convert_alpha()
+        self.start = pygame.transform.scale(self.start, (150, 75))
+        self.table = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Table.png").convert_alpha()
+        self.table = pygame.transform.scale(self.table, (150, 55))
 
         self.running = True
         self.show_menu()
@@ -42,32 +39,30 @@ class MainPage:
             mouse_pressed = pygame.mouse.get_pressed()[0]
 
              # Почати гру
-            icon_pos = (225, 150)
-            if pygame.Rect(icon_pos[0], icon_pos[1], self.icon.get_width(), self.icon.get_height()).collidepoint(mouse_pos):
+            start_pos = (225, 150)
+            if pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height()).collidepoint(mouse_pos):
                 if mouse_pressed:
-                    darkened_icon = self.icon.copy()
-                    darkened_icon.fill((150, 150, 150, 100), special_flags=pygame.BLEND_RGBA_MULT)
-                    self.screen.blit(darkened_icon, icon_pos)
+                    darkened_start = self.start.copy()
+                    darkened_start.fill((150, 150, 150, 200), special_flags=pygame.BLEND_RGBA_MULT)
+                    self.screen.blit(darkened_start, start_pos)
                     
                 else:
-                    self.screen.blit(self.icon, icon_pos)
+                    self.screen.blit(self.start, start_pos)
             else:
-                self.screen.blit(self.icon, icon_pos)
-            
-            self.records_pressed = False 
+                self.screen.blit(self.start, start_pos)
 
-            if self.records_button.collidepoint(mouse_pos):
+            #Таблиця рекордів
+            table_pos = (227, 235)
+            if pygame.Rect(table_pos[0], table_pos[1], self.table.get_width(), self.table.get_height()).collidepoint(mouse_pos):
                 if mouse_pressed:
-                    self.records_pressed = True  # Запам’ятовуємо, що кнопку натиснули
-                elif self.records_pressed:  
-                    self.records_pressed = False  # Скидаємо стан після обробки
-
-                color = (180, 180, 180) if mouse_pressed else (200, 200, 200)  # Затемнення при натисканні
+                    darkened_table = self.table.copy()
+                    darkened_table.fill((150, 150, 150, 200), special_flags=pygame.BLEND_RGBA_MULT)
+                    self.screen.blit(darkened_table, table_pos)
+                    
+                else:
+                    self.screen.blit(self.table, table_pos)
             else:
-                color = (80, 181, 250)  # Звичайний колір
-
-            pygame.draw.rect(self.screen, color, self.records_button, border_radius=8)    
-            self.draw_text("Таблиця рекордів", self.table, (250, 250, 250), 232, 260)
+                self.screen.blit(self.table, table_pos)
             
             pygame.display.flip()
             
