@@ -13,64 +13,100 @@ class MainPage:
         # Шрифти
         self.font = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Regular.ttf", 36)
         self.small_font = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Regular.ttf", 28)
-        self.table = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Bold.ttf", 16)
-        
-        # Кнопки               
+
+        # Кнопка "Почати гру"
         self.start = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Start.png").convert_alpha()
         self.start = pygame.transform.scale(self.start, (150, 75))
-        self.table = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Table.png").convert_alpha()
-        self.table = pygame.transform.scale(self.table, (150, 55))
 
         self.running = True
+        self.choosing_difficulty = False  # Чи відкрито вікно вибору складності
         self.show_menu()
-    def draw_text(self, text, font, color, x, y):
-        text_surface = font.render(text, True, color)
-        self.screen.blit(text_surface, (x, y))
-    
+
     def show_menu(self):
         while self.running:
             self.screen.fill((200, 200, 200))
-            # Фон
-            self.screen.blit(self.background, (-50, 0))          
-            self.draw_text("Minesweeper", self.font, (250, 250, 250), 200, 30)            
+            self.screen.blit(self.background, (-50, 0))
             
+            # Назва гри
+            text_surface = self.font.render("Minesweeper", True, (250, 250, 250))
+            self.screen.blit(text_surface, (200, 30))
 
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()[0]
 
-             # Почати гру
+            # Почати гру
             start_pos = (225, 150)
-            if pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height()).collidepoint(mouse_pos):
-                if mouse_pressed:
-                    darkened_start = self.start.copy()
-                    darkened_start.fill((150, 150, 150, 200), special_flags=pygame.BLEND_RGBA_MULT)
-                    self.screen.blit(darkened_start, start_pos)
-                    
-                else:
-                    self.screen.blit(self.start, start_pos)
-            else:
-                self.screen.blit(self.start, start_pos)
+            start_rect = pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height())
 
-            #Таблиця рекордів
-            table_pos = (227, 235)
-            if pygame.Rect(table_pos[0], table_pos[1], self.table.get_width(), self.table.get_height()).collidepoint(mouse_pos):
-                if mouse_pressed:
-                    darkened_table = self.table.copy()
-                    darkened_table.fill((150, 150, 150, 200), special_flags=pygame.BLEND_RGBA_MULT)
-                    self.screen.blit(darkened_table, table_pos)
-                    
-                else:
-                    self.screen.blit(self.table, table_pos)
-            else:
-                self.screen.blit(self.table, table_pos)
-            
+            if start_rect.collidepoint(mouse_pos) and mouse_pressed:
+                self.choosing_difficulty = True
+
+            self.screen.blit(self.start, start_pos)
+
+            # Відображення вікна вибору складності
+            if self.choosing_difficulty:
+                self.show_difficulty_popup()
+
             pygame.display.flip()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False                       
+                    self.running = False
         pygame.quit()
         sys.exit()
-        
+
+    def show_difficulty_popup(self):
+        """ Відображає невелике вікно вибору складності """
+        popup_rect = pygame.Rect(175, 100, 250, 200)  # Розмір спливаючого вікна
+        buttons = {
+            "Простий": pygame.Rect(200, 150, 200, 40),
+            "Стандартний": pygame.Rect(200, 200, 200, 40),
+            "Складний": pygame.Rect(200, 250, 200, 40),
+        }
+
+        while self.choosing_difficulty:
+            self.screen.blit(self.background, (-50, 0))  # Відновлюємо фон без затемнення
+            pygame.draw.rect(self.screen, (60, 60, 60), popup_rect, border_radius=10)  # Спливаюче вікно
+            
+            # Заголовок "Оберіть складність"
+            title_surface = self.font.render("Оберіть складність", True, (255, 255, 255))
+            self.screen.blit(title_surface, (135, 55))  # Фіксоване розташування
+
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()[0]
+
+            for name, rect in buttons.items():
+                color = (80, 181, 250)
+                if rect.collidepoint(mouse_pos):
+                    if mouse_pressed:
+                        color = (50, 100, 180)
+                        if name == "Простий":
+                            self.start_easy_mode()
+                            self.choosing_difficulty = False
+                    else:
+                        color = (100, 200, 255)
+
+                pygame.draw.rect(self.screen, color, rect, border_radius=8)
+                
+                # Відображення тексту на кнопці вручну
+                text_surface = self.small_font.render(name, True, (255, 255, 255))
+                text_x = rect.x + (rect.width - text_surface.get_width()) // 2  # Відцентрування тексту вручну
+                text_y = rect.y + (rect.height - text_surface.get_height()) // 2
+                self.screen.blit(text_surface, (text_x, text_y))
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if not popup_rect.collidepoint(event.pos):  
+                        self.choosing_difficulty = False  # Закриваємо вікно, якщо клік поза ним
+
+    def start_easy_mode(self):
+        """ Запускає гру в простому режимі """
+        print("Запуск простого режиму...")
+
 if __name__ == "__main__":
     MainPage()
