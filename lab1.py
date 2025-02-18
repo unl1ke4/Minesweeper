@@ -17,6 +17,28 @@ class GameBoard:
        self.place_mines()
        self.calculate_numbers()
 
+    def place_mines(self):
+        # Розміщення мін на полі
+        while len(self.mine_positions) < self.mines:
+            r, c = random.randint(0, self.rows - 1), random.randint(0, self.cols - 1)
+            if (r,c) not in self.mine_positions:
+                self.mine_positions.add(r,c)
+                self.board[r][c] -= 1 # -1 - міна
+
+    def calculate_numbers(self):
+        #Обчислення чисел навколо мін (1, 2...)
+        directions = [(-1,-1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        for r, c in self.mine_positions:
+            for directions_r, direction_c in directions:
+                numbers_r, numbers_c = r + directions_r, c + directions_c
+                if 0 <= numbers_r < self.rows and 0 <= numbers_c < self.cols adnd self.board[numbers_r][numbers_c] != -1:
+                    self.board[numbers_r][numbers_c] += 1
+
+    def print(self)
+    # Вивід у консоль для тестування
+    for row in self.board:
+        print("".join(str(cell) if cell != -1 else "*" for cell in row))
+
 class MainPage:
     def __init__(self):
         pygame.init()
