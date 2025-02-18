@@ -1,5 +1,21 @@
 import pygame
 import sys
+import random
+
+class GameBoard:
+    # Клас для генерації ігрового поля та роботи з ним
+    def __init__(self, rows, cols, mines):
+        self.rows = rows
+        self.cols = cols
+        self.mines = mines
+        self.bord = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.mine_positions = set()
+        self.generate_board()
+
+    def generate_board(self):
+       # Розміщення мін та обчислення значень навколо них
+       self.place_mines()
+       self.calculate_numbers()
 
 class MainPage:
     def __init__(self):
@@ -8,14 +24,14 @@ class MainPage:
         # Налаштування вікна
         self.screen = pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Minesweeper")
-        self.background = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/fon.png").convert()
+        self.background = pygame.image.load("assets/fon.png").convert()
 
         # Шрифти
-        self.font = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Regular.ttf", 36)
-        self.small_font = pygame.font.Font("D:/Нова папка/git/Minesweeper/type/Play-Regular.ttf", 28)
+        self.font = pygame.font.Font("type/Play-Regular.ttf", 36)
+        self.small_font = pygame.font.Font("type/Play-Regular.ttf", 28)
 
         # Кнопка "Почати гру"
-        self.start = pygame.image.load("D:/Нова папка/git/Minesweeper/assets/Start.png").convert_alpha()
+        self.start = pygame.image.load("assets/Start.png").convert_alpha()
         self.start = pygame.transform.scale(self.start, (150, 75))
 
         self.running = True
@@ -56,7 +72,7 @@ class MainPage:
         sys.exit()
 
     def show_difficulty_popup(self):
-        """ Відображає невелике вікно вибору складності """
+        # Відображає невелике вікно вибору складності
         popup_rect = pygame.Rect(175, 100, 250, 200)  
         buttons = {
             "Простий": pygame.Rect(200, 130, 200, 40),
@@ -105,7 +121,7 @@ class MainPage:
                         self.choosing_difficulty = False  
 
     def start_easy_mode(self):
-        """ Запускає гру в простому режимі """
+        # Запускає гру в простому режимі
         print("Запуск простого режиму...")
 
 if __name__ == "__main__":
