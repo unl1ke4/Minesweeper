@@ -8,7 +8,7 @@ class GameBoard:
         self.rows = rows
         self.cols = cols
         self.mines = mines
-        self.bord = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.board = [[0 for _ in range(cols)] for _ in range(rows)]
         self.mine_positions = set()
         self.generate_board()
 
@@ -22,22 +22,22 @@ class GameBoard:
         while len(self.mine_positions) < self.mines:
             r, c = random.randint(0, self.rows - 1), random.randint(0, self.cols - 1)
             if (r,c) not in self.mine_positions:
-                self.mine_positions.add(r,c)
+                self.mine_positions.add((r,c))
                 self.board[r][c] -= 1 # -1 - міна
 
     def calculate_numbers(self):
         #Обчислення чисел навколо мін (1, 2...)
         directions = [(-1,-1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         for r, c in self.mine_positions:
-            for directions_r, direction_c in directions:
+            for directions_r, directions_c in directions:
                 numbers_r, numbers_c = r + directions_r, c + directions_c
-                if 0 <= numbers_r < self.rows and 0 <= numbers_c < self.cols adnd self.board[numbers_r][numbers_c] != -1:
+                if 0 <= numbers_r < self.rows and 0 <= numbers_c < self.cols and self.board[numbers_r][numbers_c] != -1:
                     self.board[numbers_r][numbers_c] += 1
 
-    def print(self)
+    def print_info(self):
     # Вивід у консоль для тестування
-    for row in self.board:
-        print("".join(str(cell) if cell != -1 else "*" for cell in row))
+        for row in self.board:
+            print("".join(str(cell) if cell != -1 else "*" for cell in row))
 
 class MainPage:
     def __init__(self):
@@ -57,7 +57,8 @@ class MainPage:
         self.start = pygame.transform.scale(self.start, (150, 75))
 
         self.running = True
-        self.choosing_difficulty = False  
+        self.choosing_difficulty = False
+        self.board = None  
         self.show_menu()
 
     def show_menu(self):
@@ -119,8 +120,12 @@ class MainPage:
                     if mouse_pressed:
                         color = (50, 100, 180)
                         if name == "Простий":
-                            self.start_easy_mode()
-                            self.choosing_difficulty = False
+                            self.start_game(8, 8, 10)
+                        elif name == "Стандартний":
+                            self.start_game(10, 10, 20)
+                        elif name == "Складний":
+                            self.start_game(12, 12, 30)
+                        self.choosing_difficulty = False
                     else:
                         color = (100, 200, 255)
 
@@ -142,9 +147,15 @@ class MainPage:
                     if not popup_rect.collidepoint(event.pos):  
                         self.choosing_difficulty = False  
 
-    def start_easy_mode(self):
+    def start_game(self, rows, cols, mines):
+    # Ініціалізація гри із заданим рівнем складності
+        self.game_board = GameBoard(rows, cols, mines)
+        print(f"Початок гри! Розмір {rows}x{cols}, міни: {mines}")
+        self.game_board.print_info()
+
+    """def start_easy_mode(self):
         # Запускає гру в простому режимі
-        print("Запуск простого режиму...")
+        print("Запуск простого режиму...")"""
 
 if __name__ == "__main__":
     MainPage()
