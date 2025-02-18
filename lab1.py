@@ -19,7 +19,7 @@ class MainPage:
         self.start = pygame.transform.scale(self.start, (150, 75))
 
         self.running = True
-        self.choosing_difficulty = False  # Чи відкрито вікно вибору складності
+        self.choosing_difficulty = False  
         self.show_menu()
 
     def show_menu(self):
@@ -57,20 +57,20 @@ class MainPage:
 
     def show_difficulty_popup(self):
         """ Відображає невелике вікно вибору складності """
-        popup_rect = pygame.Rect(175, 100, 250, 200)  # Розмір спливаючого вікна
+        popup_rect = pygame.Rect(175, 100, 250, 200)  
         buttons = {
-            "Простий": pygame.Rect(200, 150, 200, 40),
-            "Стандартний": pygame.Rect(200, 200, 200, 40),
-            "Складний": pygame.Rect(200, 250, 200, 40),
+            "Простий": pygame.Rect(200, 130, 200, 40),
+            "Стандартний": pygame.Rect(200, 180, 200, 40),
+            "Складний": pygame.Rect(200, 230, 200, 40),
         }
 
         while self.choosing_difficulty:
-            self.screen.blit(self.background, (-50, 0))  # Відновлюємо фон без затемнення
-            pygame.draw.rect(self.screen, (60, 60, 60), popup_rect, border_radius=10)  # Спливаюче вікно
+            self.screen.blit(self.background, (-50, 0))  
+            pygame.draw.rect(self.screen, (60, 60, 60), popup_rect, border_radius=10)  
             
-            # Заголовок "Оберіть складність"
+           
             title_surface = self.font.render("Оберіть складність", True, (255, 255, 255))
-            self.screen.blit(title_surface, (135, 55))  # Фіксоване розташування
+            self.screen.blit(title_surface, (135, 45))  
 
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -88,9 +88,9 @@ class MainPage:
 
                 pygame.draw.rect(self.screen, color, rect, border_radius=8)
                 
-                # Відображення тексту на кнопці вручну
+                
                 text_surface = self.small_font.render(name, True, (255, 255, 255))
-                text_x = rect.x + (rect.width - text_surface.get_width()) // 2  # Відцентрування тексту вручну
+                text_x = rect.x + (rect.width - text_surface.get_width()) // 2 
                 text_y = rect.y + (rect.height - text_surface.get_height()) // 2
                 self.screen.blit(text_surface, (text_x, text_y))
 
@@ -102,7 +102,7 @@ class MainPage:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if not popup_rect.collidepoint(event.pos):  
-                        self.choosing_difficulty = False  # Закриваємо вікно, якщо клік поза ним
+                        self.choosing_difficulty = False  
 
     def start_easy_mode(self):
         """ Запускає гру в простому режимі """
