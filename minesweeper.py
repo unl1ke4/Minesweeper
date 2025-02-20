@@ -77,10 +77,21 @@ class MainPage:
             start_pos = (225, 150)
             start_rect = pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height())
 
-            if start_rect.collidepoint(mouse_pos) and mouse_pressed:
-                self.choosing_difficulty = True
-
-            self.screen.blit(self.start, start_pos)
+            if start_rect.collidepoint(mouse_pos):
+                if mouse_pressed and not self.mouse_held:
+                    self.mouse_held = True
+                    darkened_start = self.start.copy()
+                    darkened_start.fill((150, 150, 150, 200), special_flags=pygame.BLEND_RGBA_MULT)
+                    self.screen.blit(darkened_start, start_pos)
+                elif not mouse_pressed and self.mouse_held:
+                    self.mouse_held = False
+                    self.choosing_difficulty = True
+                    self.screen.blit(self.start, start_pos)
+                else:
+                    self.screen.blit(self.start, start_pos)
+            else:
+                self.mouse_held = False
+                self.screen.blit(self.start, start_pos)
 
             # Відображення вікна вибору складності
             if self.choosing_difficulty:
