@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import time
 
 class GameBoard:
     def __init__(self, rows, cols, mines):
@@ -37,7 +38,7 @@ DARK_GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-FLAG_COLOR = (255, 165, 0)
+FLAG_COLOR = (80, 181, 250)
 
 CELL_SIZE = 30  
 HEADER_HEIGHT = 50  
@@ -60,13 +61,38 @@ class MinesweeperGame:
         self.revealed = [[False] * cols for _ in range(rows)]
         self.flags = set()
         self.running = True
+        self.paused = False
         
+        self.start_time = time.time()
+        
+        # Кнопки
+        self.flag_button = pygame.Rect(10, 10, 30, 30)
+        self.flag_button_pressed = False  
+        self.flag_icon = pygame.image.load("assets/flag.png")  
+        self.flag_icon = pygame.transform.scale(self.flag_icon, (30, 30)) 
+        self.pause_button = pygame.Rect(self.width - 40, 10, 30, 30)
+
         self.run_game()
 
     def draw_board(self):
         self.screen.fill(WHITE)
 
         pygame.draw.rect(self.screen, GRAY, (0, 0, self.width, HEADER_HEIGHT))
+        
+        # Таймер
+        elapsed_time = int(time.time() - self.start_time)
+        timer_text = self.font.render(f"Time: {elapsed_time}s", True, WHITE)
+        self.screen.blit(timer_text, (self.width // 2 - 40, 10))
+
+        pygame.draw.rect(self.screen, FLAG_COLOR, self.flag_button) 
+
+        flag_button_color = (200, 100, 0) if self.flag_button_pressed else FLAG_COLOR  
+        pygame.draw.rect(self.screen, flag_button_color, self.flag_button)  
+        self.screen.blit(self.flag_icon, (self.flag_button.x, self.flag_button.y))  
+
+        pygame.draw.rect(self.screen, DARK_GRAY, self.pause_button)
+        pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 8, self.pause_button.y + 5, 5, 20))
+        pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 18, self.pause_button.y + 5, 5, 20))
 
         for r in range(self.rows):
             for c in range(self.cols):
@@ -86,6 +112,50 @@ class MinesweeperGame:
                         pygame.draw.polygon(self.screen, FLAG_COLOR, [(x + 5, y + 25), (x + 15, y + 5), (x + 25, y + 25)])
                 
                 pygame.draw.rect(self.screen, BLACK, rect, 2)
+
+    def pause_menu(self):
+        self.font = pygame.font.Font("type/Play-Regular.ttf", 14)
+
+        menu_width = 140
+        menu_height = 160
+        menu_x = (self.width - menu_width) // 2
+        menu_y = (self.height - menu_height) // 2
+        menu_rect = pygame.Rect(menu_x, menu_y, menu_width, menu_height)
+
+        button_width = 120
+        button_height = 28
+        button_spacing = 12  
+
+        buttons = {
+            "Продовжити": pygame.Rect(menu_x + (menu_width - button_width) // 2, menu_y + 25, button_width, button_height),
+            "Рестарт": pygame.Rect(menu_x + (menu_width - button_width) // 2, menu_y + 25 + button_height + button_spacing, button_width, button_height),
+            "Головне меню": pygame.Rect(menu_x + (menu_width - button_width) // 2, menu_y + 25 + 2 * (button_height + button_spacing), button_width, button_height)
+        }
+
+        while self.paused:
+            pygame.draw.rect(self.screen, GRAY, menu_rect, border_radius=10)
+
+            for name, rect in buttons.items():
+                pygame.draw.rect(self.screen, FLAG_COLOR, rect, border_radius=8)
+                text = self.font.render(name, True, BLACK)
+                text_x = rect.x + (rect.width - text.get_width()) // 2
+                text_y = rect.y + (rect.height - text.get_height()) // 2
+                self.screen.blit(text, (text_x, text_y))
+
+            pygame.display.flip()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if buttons["Продовжити"].collidepoint(event.pos):
+                        self.paused = False
+                    elif buttons["Рестарт"].collidepoint(event.pos):
+                        self.__init__(self.rows, self.cols, self.mines)
+                    elif buttons["Головне меню"].collidepoint(event.pos):
+                        self.running = False
+                        return
 
     def reveal_cell(self, r, c):
         if (r, c) in self.flags or self.revealed[r][c]:
@@ -113,25 +183,36 @@ class MinesweeperGame:
         r = (pos[1] - HEADER_HEIGHT) // CELL_SIZE
         c = pos[0] // CELL_SIZE
         
-        if button == 1: 
+        if button == 1:  
             self.reveal_cell(r, c)
         elif button == 3:  
             if (r, c) in self.flags:
                 self.flags.remove((r, c))
             elif len(self.flags) < self.mines:
                 self.flags.add((r, c))
-    
+        #Флаг
+        if self.flag_button.collidepoint(pos):  
+            self.flag_button_pressed = not self.flag_button_pressed  
+            self.draw_board() 
+            pygame.display.flip()  
+
     def run_game(self):
         while self.running:
             self.draw_board()
             pygame.display.flip()
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.handle_click(event.pos, event.button)
+                    if self.pause_button.collidepoint(event.pos):  # Перевіряємо, чи натиснули паузу
+                        self.paused = True
+                        self.pause_menu()
+                    else:
+                        self.handle_click(event.pos, event.button)
+
+
 
 class MainPage:
     def __init__(self):
@@ -159,8 +240,7 @@ class MainPage:
         while self.running:
             self.screen.fill((200, 200, 200))
             self.screen.blit(self.background, (-50, 0))
-            
-            # Назва гри
+
             text_surface = self.font.render("Minesweeper", True, (250, 250, 250))
             self.screen.blit(text_surface, (200, 30))
 
@@ -254,9 +334,6 @@ class MainPage:
         self.running = False 
         MinesweeperGame(rows, cols, mines) 
 
-    """def start_easy_mode(self):
-        # Запускає гру в простому режимі
-        print("Запуск простого режиму...")"""
 
 if __name__ == "__main__":
     MainPage()
