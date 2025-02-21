@@ -69,7 +69,7 @@ class MinesweeperGame:
         self.flag_button = pygame.Rect(10, 10, 30, 30)
         self.flag_button_pressed = False  
         self.flag_icon = pygame.image.load("assets/flag.png")  
-        self.flag_icon = pygame.transform.scale(self.flag_icon, (30, 30)) 
+        self.flag_icon = pygame.transform.scale(self.flag_icon, (CELL_SIZE, CELL_SIZE))
         self.pause_button = pygame.Rect(self.width - 40, 10, 30, 30)
 
         self.run_game()
@@ -94,6 +94,11 @@ class MinesweeperGame:
         pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 8, self.pause_button.y + 5, 5, 20))
         pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 18, self.pause_button.y + 5, 5, 20))
 
+        # Перевірка через вбудовану функцію Python, чи існує в об'єкта певний атрибут
+        if hasattr(self, 'explosion_message_shown') and self.explosion_message_shown:
+            explosion_text = self.font.render("💥 Вибух! Гра продовжується!", True, RED)
+            self.screen.blit(explosion_text, (self.width // 2 - explosion_text.get_width() // 2, self.height // 2))
+
         for r in range(self.rows):
             for c in range(self.cols):
                 x, y = c * CELL_SIZE, r * CELL_SIZE + HEADER_HEIGHT
@@ -109,7 +114,7 @@ class MinesweeperGame:
                 else:
                     pygame.draw.rect(self.screen, GRAY, rect)
                     if (r, c) in self.flags:
-                        pygame.draw.polygon(self.screen, FLAG_COLOR, [(x + 5, y + 25), (x + 15, y + 5), (x + 25, y + 25)])
+                        self.screen.blit(self.flag_icon, (x, y))
                 
                 pygame.draw.rect(self.screen, BLACK, rect, 2)
 
@@ -164,10 +169,15 @@ class MinesweeperGame:
         self.revealed[r][c] = True
         
         if self.game_board.board[r][c] == -1:
-            self.running = False
-            print("💥 Вибух! Гра закінчена!")
+            self.show_explosion_message()  # Викликаємо функцію для показу вибуху
         elif self.game_board.board[r][c] == 0:
             self.reveal_adjacent(r, c)
+
+    def show_explosion_message(self):
+    # Виведемо повідомлення про вибух
+        print("💥 Вибух! Гра триває! Ви можете продовжити грати!")
+        # Можна додати графічне повідомлення на екрані, щоб гравець зрозумів, що вибух стався
+        self.explosion_message_shown = True
     
     def reveal_adjacent(self, r, c):
         directions = [(-1,-1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
