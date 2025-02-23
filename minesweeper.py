@@ -335,7 +335,7 @@ class MainPage:
                             self.start_game(12, 12, 30)
                         elif name == "Назад":
                             self.choosing_difficulty = False
-                            return show_menu()
+                            return self.show_menu()
                     else:
                         color = (100, 200, 255)
 
