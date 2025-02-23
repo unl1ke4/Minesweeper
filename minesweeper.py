@@ -160,7 +160,8 @@ class MinesweeperGame:
                         self.__init__(self.rows, self.cols, self.mines)
                     elif buttons["Головне меню"].collidepoint(event.pos):
                         self.running = False
-                        return
+                        self.paused = False
+                        return MainPage()
 
     def reveal_cell(self, r, c):
         if (r, c) in self.flags or self.revealed[r][c]:
@@ -261,6 +262,10 @@ class MainPage:
             start_pos = (225, 150)
             start_rect = pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height())
 
+            # Вийти з гри
+            exit_pos = (225, 250)
+            exit_rect = pygame.Rect(exit_pos[0], exit_pos[1], 150, 75)
+
             if start_rect.collidepoint(mouse_pos):
                 if mouse_pressed and not self.mouse_held:
                     self.mouse_held = True
@@ -273,9 +278,18 @@ class MainPage:
                     self.screen.blit(self.start, start_pos)
                 else:
                     self.screen.blit(self.start, start_pos)
+
+            elif exit_rect.collidepoint(mouse_pos):
+                if mouse_pressed:
+                    pygame.quit()
+                    sys.exit()
             else:
                 self.mouse_held = False
                 self.screen.blit(self.start, start_pos)
+
+            pygame.draw.rect(self.screen, (255, 0, 0), exit_rect, border_radius=8)
+            exit_text = self.font.render("Вихід", True, (255, 255, 255))
+            self.screen.blit(exit_text, (exit_pos[0] + 40, exit_pos[1] + 20))
 
             if self.choosing_difficulty:
                 self.show_difficulty_popup()
@@ -294,6 +308,7 @@ class MainPage:
             "Простий": pygame.Rect(200, 130, 200, 40),
             "Стандартний": pygame.Rect(200, 180, 200, 40),
             "Складний": pygame.Rect(200, 230, 200, 40),
+            "Назад": pygame.Rect(200, 280, 200, 40),
         }
 
         while self.choosing_difficulty:
@@ -318,7 +333,9 @@ class MainPage:
                             self.start_game(10, 10, 20)
                         elif name == "Складний":
                             self.start_game(12, 12, 30)
-                        self.choosing_difficulty = False
+                        elif name == "Назад":
+                            self.choosing_difficulty = False
+                            return show_menu()
                     else:
                         color = (100, 200, 255)
 
