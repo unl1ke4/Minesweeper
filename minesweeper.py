@@ -73,6 +73,65 @@ class MinesweeperGame:
         self.pause_button = pygame.Rect(self.width - 40, 10, 30, 30)
 
         self.run_game()
+        
+
+    def check_win(self):
+        """ Перевіряє, чи гравець відкрив усі клітинки, які не є мінами """
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if self.game_board.board[r][c] != -1 and not self.revealed[r][c]:
+                    return
+        self.show_win_message()
+
+    def show_win_message(self):
+        """ Викликає екран завершення гри після виграшу """
+        print("🎉 Ви виграли!")  # Для відладки
+        self.running = False  # Зупиняємо гру
+        self.win_screen()  # Викликаємо вікно виграшу
+
+    def win_screen(self):
+        """ Показує екран виграшу з двома кнопками: 'Головне меню' і 'Рестарт' """
+        font = pygame.font.Font("type/Play-Regular.ttf", 20)
+        
+        menu_width, menu_height = 205, 150
+        menu_x, menu_y = (self.width - menu_width) // 2, (self.height - menu_height) // 2
+        menu_rect = pygame.Rect(menu_x, menu_y, menu_width, menu_height)
+        
+        button_width, button_height = 142, 38
+        restart_button = pygame.Rect(menu_x + 32, menu_y + 45, button_width, button_height)
+        menu_button = pygame.Rect(menu_x + 32, menu_y + 95, button_width, button_height)
+
+        while True:
+            self.screen.fill((50, 50, 50))  # Фон
+
+            pygame.draw.rect(self.screen, (0, 200, 0), menu_rect, border_radius=10)
+            
+            text = font.render("Ви виграли!", True, WHITE)
+            self.screen.blit(text, (menu_x + 41, menu_y + 15))
+
+            pygame.draw.rect(self.screen, (80, 181, 250), restart_button, border_radius=5)
+            pygame.draw.rect(self.screen, (80, 181, 250), menu_button, border_radius=5)
+
+            restart_text = font.render("Рестарт", True, WHITE)
+            menu_text = font.render("Головне меню", True, WHITE)
+
+            self.screen.blit(restart_text, (restart_button.x + 36, restart_button.y + 8))
+            self.screen.blit(menu_text, (menu_button.x + 5, menu_button.y + 10))
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_button.collidepoint(event.pos):
+                        self.__init__(self.rows, self.cols, self.mines)  # Перезапускаємо гру
+                        return
+                    elif menu_button.collidepoint(event.pos):
+                        self.running = False
+                        return MainPage()  # Повертаємось у головне меню
+
 
     def draw_board(self):
         self.screen.fill(WHITE)
@@ -138,7 +197,7 @@ class MinesweeperGame:
         }
 
         while self.paused:
-            pygame.draw.rect(self.screen, GRAY, menu_rect, border_radius=10)
+            pygame.draw.rect(self.screen, (60, 60, 60), menu_rect, border_radius=10)
 
             for name, rect in buttons.items():
                 pygame.draw.rect(self.screen, FLAG_COLOR, rect, border_radius=8)
@@ -174,11 +233,57 @@ class MinesweeperGame:
         elif self.game_board.board[r][c] == 0:
             self.reveal_adjacent(r, c)
 
+        
+
     def show_explosion_message(self):
-    # Виведемо повідомлення про вибух
-        print("💥 Вибух! Гра триває! Ви можете продовжити грати!")
-        # Можна додати графічне повідомлення на екрані, щоб гравець зрозумів, що вибух стався
-        self.explosion_message_shown = True
+        """ Викликає екран завершення гри після вибуху """
+        print("💥 Ви програли!")  # Для відладки
+        self.running = False  # Зупиняємо гру
+        self.game_over_screen()  # Викликаємо вікно програшу
+
+    def game_over_screen(self):
+        """ Показує екран програшу з двома кнопками: 'Головне меню' і 'Рестарт' """
+        font = pygame.font.Font("type/Play-Regular.ttf", 20)
+        
+        menu_width, menu_height = 205, 150
+        menu_x, menu_y = (self.width - menu_width) // 2, (self.height - menu_height) // 2
+        menu_rect = pygame.Rect(menu_x, menu_y, menu_width, menu_height)
+        
+        button_width, button_height = 142, 38
+        restart_button = pygame.Rect(menu_x + 32, menu_y + 45, button_width, button_height)
+        menu_button = pygame.Rect(menu_x + 32, menu_y + 95, button_width, button_height)
+
+        while True:
+            self.screen.fill((50, 50, 50))  # Фон
+
+            pygame.draw.rect(self.screen, (200, 0, 0), menu_rect, border_radius=10)
+            
+            text = font.render("Ви програли!", True, WHITE)
+            self.screen.blit(text, (menu_x + 41, menu_y + 15))
+
+            pygame.draw.rect(self.screen, (0, 200, 0), restart_button, border_radius=5)
+            pygame.draw.rect(self.screen, (80, 181, 250), menu_button, border_radius=5)
+
+            restart_text = font.render("Рестарт", True, WHITE)
+            menu_text = font.render("Головне меню", True, WHITE)
+
+            self.screen.blit(restart_text, (restart_button.x + 36, restart_button.y + 8))
+            self.screen.blit(menu_text, (menu_button.x + 5, menu_button.y + 10))
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_button.collidepoint(event.pos):
+                        self.__init__(self.rows, self.cols, self.mines)  # Перезапускаємо гру
+                        return
+                    elif menu_button.collidepoint(event.pos):
+                        self.running = False
+                        return MainPage()  # Повертаємось у головне меню
+
     
     def reveal_adjacent(self, r, c):
         directions = [(-1,-1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
@@ -263,8 +368,8 @@ class MainPage:
             start_rect = pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height())
 
             # Вийти з гри
-            exit_pos = (225, 250)
-            exit_rect = pygame.Rect(exit_pos[0], exit_pos[1], 150, 75)
+            exit_pos = (229, 250)
+            exit_rect = pygame.Rect(exit_pos[0], exit_pos[1], 145, 75)
 
             if start_rect.collidepoint(mouse_pos):
                 if mouse_pressed and not self.mouse_held:
@@ -287,13 +392,13 @@ class MainPage:
                 self.mouse_held = False
                 self.screen.blit(self.start, start_pos)
 
-            pygame.draw.rect(self.screen, (255, 0, 0), exit_rect, border_radius=8)
+            pygame.draw.rect(self.screen, (240, 0, 0), exit_rect, border_radius=8)
             exit_text = self.font.render("Вихід", True, (255, 255, 255))
-            self.screen.blit(exit_text, (exit_pos[0] + 40, exit_pos[1] + 20))
+            self.screen.blit(exit_text, (exit_pos[0] + 27, exit_pos[1] + 17))
 
             if self.choosing_difficulty:
                 self.show_difficulty_popup()
-
+             
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -303,7 +408,7 @@ class MainPage:
         sys.exit()
 
     def show_difficulty_popup(self):
-        popup_rect = pygame.Rect(175, 100, 250, 200)  
+        popup_rect = pygame.Rect(175, 110, 250, 230)  
         buttons = {
             "Простий": pygame.Rect(200, 130, 200, 40),
             "Стандартний": pygame.Rect(200, 180, 200, 40),
@@ -334,8 +439,7 @@ class MainPage:
                         elif name == "Складний":
                             self.start_game(12, 12, 30)
                         elif name == "Назад":
-                            self.choosing_difficulty = False
-                            return self.show_menu()
+                            return 
                     else:
                         color = (100, 200, 255)
 
@@ -353,7 +457,7 @@ class MainPage:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif name == "Назад":
                     if not popup_rect.collidepoint(event.pos):  
                         self.choosing_difficulty = False  
 
