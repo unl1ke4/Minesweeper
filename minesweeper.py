@@ -57,6 +57,7 @@ class MinesweeperGame:
         pygame.display.set_caption("Minesweeper")
         
         self.font = pygame.font.Font(None, 30)
+        self.font_small = pygame.font.Font(None, 18)  # Шрифт для таймера і лічильника
         self.game_board = GameBoard(rows, cols, mines)
         self.revealed = [[False] * cols for _ in range(rows)]
         self.flags = set()
@@ -64,6 +65,8 @@ class MinesweeperGame:
         self.paused = False
         
         self.start_time = time.time()
+
+        self.mines_counter = mines
         
         # Кнопки
         self.flag_button = pygame.Rect(10, 10, 30, 30)
@@ -76,16 +79,16 @@ class MinesweeperGame:
         
 
     def check_win(self):
-        """ Перевіряє, чи гравець відкрив усі клітинки, які не є мінами """
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if self.game_board.board[r][c] != -1 and not self.revealed[r][c]:
-                    return
-        self.show_win_message()
+     for r in range(len(self.game_board.board)):
+        for c in range(len(self.game_board.board[0])):
+            if self.game_board.board[r][c] != -1 and not self.revealed[r][c]:
+                return  # Гра ще не виграна
+    
+     self.show_win_message()  # Відображаємо вікно виграшу
+
 
     def show_win_message(self):
         """ Викликає екран завершення гри після виграшу """
-        print("🎉 Ви виграли!")  # Для відладки
         self.running = False  # Зупиняємо гру
         self.win_screen()  # Викликаємо вікно виграшу
 
@@ -138,25 +141,23 @@ class MinesweeperGame:
 
         pygame.draw.rect(self.screen, GRAY, (0, 0, self.width, HEADER_HEIGHT))
         
-        # Таймер
+        # Віконце для таймера та лічильника мін
+        pygame.draw.rect(self.screen, DARK_GRAY, (self.width // 2 - 50, 5, 100, 40), border_radius=5)
+
+    # Таймер
         elapsed_time = int(time.time() - self.start_time)
-        timer_text = self.font.render(f"Time: {elapsed_time}s", True, WHITE)
-        self.screen.blit(timer_text, (self.width // 2 - 40, 10))
+        timer_text = self.font_small.render(f"Time: {elapsed_time}s", True, WHITE)
+        self.screen.blit(timer_text, (self.width // 2 - 40, 8)) 
 
-        pygame.draw.rect(self.screen, FLAG_COLOR, self.flag_button) 
+    # Лічильник мін 
+        mines_text = self.font_small.render(f"Mines: {self.mines_counter}", True, WHITE)
+        self.screen.blit(mines_text, (self.width // 2 - 40, 24))  
 
-        flag_button_color = (200, 100, 0) if self.flag_button_pressed else FLAG_COLOR  
-        pygame.draw.rect(self.screen, flag_button_color, self.flag_button)  
-        self.screen.blit(self.flag_icon, (self.flag_button.x, self.flag_button.y))  
 
         pygame.draw.rect(self.screen, DARK_GRAY, self.pause_button)
         pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 8, self.pause_button.y + 5, 5, 20))
         pygame.draw.rect(self.screen, WHITE, (self.pause_button.x + 18, self.pause_button.y + 5, 5, 20))
 
-        # Перевірка через вбудовану функцію Python, чи існує в об'єкта певний атрибут
-        if hasattr(self, 'explosion_message_shown') and self.explosion_message_shown:
-            explosion_text = self.font.render("💥 Вибух! Гра продовжується!", True, RED)
-            self.screen.blit(explosion_text, (self.width // 2 - explosion_text.get_width() // 2, self.height // 2))
 
         for r in range(self.rows):
             for c in range(self.cols):
@@ -232,12 +233,12 @@ class MinesweeperGame:
             self.show_explosion_message()  # Викликаємо функцію для показу вибуху
         elif self.game_board.board[r][c] == 0:
             self.reveal_adjacent(r, c)
+        self.check_win()  # Додаємо перевірку на виграш
 
         
 
     def show_explosion_message(self):
         """ Викликає екран завершення гри після вибуху """
-        print("💥 Ви програли!")  # Для відладки
         self.running = False  # Зупиняємо гру
         self.game_over_screen()  # Викликаємо вікно програшу
 
@@ -304,8 +305,10 @@ class MinesweeperGame:
         elif button == 3:  
             if (r, c) in self.flags:
                 self.flags.remove((r, c))
+                self.mines_counter += 1  # Якщо знімаємо прапорець, додаємо назад до лічильника
             elif len(self.flags) < self.mines:
                 self.flags.add((r, c))
+                self.mines_counter -= 1  # Якщо ставимо прапорець, зменшуємо лічильник
         #Флаг
         if self.flag_button.collidepoint(pos):  
             self.flag_button_pressed = not self.flag_button_pressed  
