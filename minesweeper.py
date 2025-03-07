@@ -83,15 +83,15 @@ class MinesweeperGame:
      for r in range(len(self.game_board.board)):
         for c in range(len(self.game_board.board[0])):
             if self.game_board.board[r][c] != -1 and not self.revealed[r][c]:
-                return  # Гра ще не виграна
+                return  
     
-     self.show_win_message()  # Відображаємо вікно виграшу
+     self.show_win_message()  
 
 
     def show_win_message(self):
         """ Викликає екран завершення гри після виграшу """
-        self.running = False  # Зупиняємо гру
-        self.win_screen()  # Викликаємо вікно виграшу
+        self.running = False  
+        self.win_screen()  
 
     def win_screen(self):
         """ Показує екран виграшу з двома кнопками: 'Головне меню' і 'Рестарт' """
@@ -106,7 +106,7 @@ class MinesweeperGame:
         menu_button = pygame.Rect(menu_x + 32, menu_y + 95, button_width, button_height)
 
         while True:
-            self.screen.fill((50, 50, 50))  # Фон
+            self.screen.fill((50, 50, 50))  
 
             pygame.draw.rect(self.screen, (0, 200, 0), menu_rect, border_radius=10)
             
@@ -130,11 +130,11 @@ class MinesweeperGame:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if restart_button.collidepoint(event.pos):
-                        self.__init__(self.rows, self.cols, self.mines)  # Перезапускаємо гру
+                        self.__init__(self.rows, self.cols, self.mines)  
                         return
                     elif menu_button.collidepoint(event.pos):
                         self.running = False
-                        return MainPage()  # Повертаємось у головне меню
+                        return MainPage()  
 
 
     def draw_board(self):
@@ -142,15 +142,10 @@ class MinesweeperGame:
 
         pygame.draw.rect(self.screen, GRAY, (0, 0, self.width, HEADER_HEIGHT))
         
-        # Віконце для таймера та лічильника мін
         pygame.draw.rect(self.screen, DARK_GRAY, (self.width // 2 - 50, 5, 100, 40), border_radius=5)
-
-    # Таймер
         elapsed_time = int(time.time() - self.start_time)
         timer_text = self.font_small.render(f"Time: {elapsed_time}s", True, WHITE)
         self.screen.blit(timer_text, (self.width // 2 - 40, 8)) 
-
-    # Лічильник мін 
         mines_text = self.font_small.render(f"Mines: {self.mines_counter}", True, WHITE)
         self.screen.blit(mines_text, (self.width // 2 - 40, 24))  
 
@@ -231,18 +226,17 @@ class MinesweeperGame:
         self.revealed[r][c] = True
         
         if self.game_board.board[r][c] == -1:
-            self.show_explosion_message()  # Викликаємо функцію для показу вибуху
+            self.show_explosion_message() 
         elif self.game_board.board[r][c] == 0:
             self.reveal_adjacent(r, c)
-        self.check_win()  # Додаємо перевірку на виграш
+        self.check_win() 
 
         
 
     def show_explosion_message(self):
         """ Викликає екран завершення гри після вибуху """
-        self.running = False  # Зупиняємо гру
-        self.game_over_screen()  # Викликаємо вікно програшу
-
+        self.running = False 
+        self.game_over_screen()  
     def game_over_screen(self):
         """ Показує екран програшу з двома кнопками: 'Головне меню' і 'Рестарт' """
         font = pygame.font.Font("type/Play-Regular.ttf", 20)
@@ -256,7 +250,7 @@ class MinesweeperGame:
         menu_button = pygame.Rect(menu_x + 32, menu_y + 95, button_width, button_height)
 
         while True:
-            self.screen.fill((50, 50, 50))  # Фон
+            self.screen.fill((50, 50, 50)) 
 
             pygame.draw.rect(self.screen, (200, 0, 0), menu_rect, border_radius=10)
             
@@ -280,11 +274,11 @@ class MinesweeperGame:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if restart_button.collidepoint(event.pos):
-                        self.__init__(self.rows, self.cols, self.mines)  # Перезапускаємо гру
+                        self.__init__(self.rows, self.cols, self.mines)  
                         return
                     elif menu_button.collidepoint(event.pos):
                         self.running = False
-                        return MainPage()  # Повертаємось у головне меню
+                        return MainPage()  
 
     
     def reveal_adjacent(self, r, c):
@@ -306,11 +300,11 @@ class MinesweeperGame:
         elif button == 3:  
             if (r, c) in self.flags:
                 self.flags.remove((r, c))
-                self.mines_counter += 1  # Якщо знімаємо прапорець, додаємо назад до лічильника
+                self.mines_counter += 1  
             elif len(self.flags) < self.mines:
                 self.flags.add((r, c))
-                self.mines_counter -= 1  # Якщо ставимо прапорець, зменшуємо лічильник
-        #Флаг
+                self.mines_counter -= 1  
+
         if self.flag_button.collidepoint(pos):  
             self.flag_button_pressed = not self.flag_button_pressed  
             self.draw_board() 
@@ -326,7 +320,7 @@ class MinesweeperGame:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.pause_button.collidepoint(event.pos):  # Перевіряємо, чи натиснули паузу
+                    if self.pause_button.collidepoint(event.pos):  
                         self.paused = True
                         self.pause_menu()
                     else:
@@ -337,17 +331,14 @@ class MinesweeperGame:
 class MainPage:
     def __init__(self):
         pygame.init()
-        
-        # Налаштування вікна
+    
         self.screen = pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Minesweeper")
         self.background = pygame.image.load("assets/fon.png").convert()
 
-        # Шрифти
         self.font = pygame.font.Font("type/Play-Regular.ttf", 36)
         self.small_font = pygame.font.Font("type/Play-Regular.ttf", 28)
 
-        # Кнопка "Почати гру"
         self.start = pygame.image.load("assets/Start.png").convert_alpha()
         self.start = pygame.transform.scale(self.start, (150, 75))
 
@@ -367,11 +358,9 @@ class MainPage:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()[0]
 
-            # Почати гру
             start_pos = (225, 150)
             start_rect = pygame.Rect(start_pos[0], start_pos[1], self.start.get_width(), self.start.get_height())
 
-            # Вийти з гри
             exit_pos = (229, 250)
             exit_rect = pygame.Rect(exit_pos[0], exit_pos[1], 145, 75)
 
