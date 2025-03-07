@@ -58,6 +58,7 @@ class MinesweeperGame:
         
         self.font = pygame.font.Font(None, 30)
         self.font_small = pygame.font.Font(None, 18)  # Шрифт для таймера і лічильника
+        self.font_numbers = pygame.font.Font(None, 24)  # Шрифт для чисел на полі
         self.game_board = GameBoard(rows, cols, mines)
         self.revealed = [[False] * cols for _ in range(rows)]
         self.flags = set()
@@ -169,7 +170,7 @@ class MinesweeperGame:
                     if self.game_board.board[r][c] == -1:
                         pygame.draw.circle(self.screen, RED, rect.center, CELL_SIZE // 3)
                     elif self.game_board.board[r][c] > 0:
-                        text = self.font.render(str(self.game_board.board[r][c]), True, BLUE)
+                        text = self.font_numbers.render(str(self.game_board.board[r][c]), True, BLUE)
                         self.screen.blit(text, (x + CELL_SIZE // 3, y + CELL_SIZE // 4))
                 else:
                     pygame.draw.rect(self.screen, GRAY, rect)
