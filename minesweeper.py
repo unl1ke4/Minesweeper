@@ -401,12 +401,11 @@ class MainPage:
         sys.exit()
 
     def show_difficulty_popup(self):
-        popup_rect = pygame.Rect(175, 110, 250, 230)  
+        popup_rect = pygame.Rect(175, 110, 250, 180)  
         buttons = {
             "Простий": pygame.Rect(200, 130, 200, 40),
             "Стандартний": pygame.Rect(200, 180, 200, 40),
             "Складний": pygame.Rect(200, 230, 200, 40),
-            "Назад": pygame.Rect(200, 280, 200, 40),
         }
 
         while self.choosing_difficulty:
@@ -431,8 +430,6 @@ class MainPage:
                             self.start_game(10, 10, 20)
                         elif name == "Складний":
                             self.start_game(12, 12, 30)
-                        elif name == "Назад":
-                            return 
                     else:
                         color = (100, 200, 255)
 
@@ -450,7 +447,7 @@ class MainPage:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif name == "Назад":
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     if not popup_rect.collidepoint(event.pos):  
                         self.choosing_difficulty = False  
 
