@@ -36,7 +36,7 @@ jobs:
           flake8 --format=html --htmldir=reports/flake8_report --max-line-length=100
 
       - name: Upload reports as artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: reports
           path: reports
