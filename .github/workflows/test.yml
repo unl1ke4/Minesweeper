@@ -27,3 +27,6 @@ jobs:
 
       - name: Run tests
         run: pytest
+        
+      - name: Check code style
+        run: flake8 --max-line-length=100 --statistics
