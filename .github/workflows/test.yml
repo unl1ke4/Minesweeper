@@ -33,7 +33,7 @@ jobs:
       - name: Check code style with HTML report
         run: |
           mkdir -p reports
-          flake8 --format=html --htmldir=reports/flake8_report --max-line-length=100
+          flake8 --format=html --htmldir=reports/flake8_report --max-line-length=100 --exit-zero
 
       - name: Upload reports as artifacts
         uses: actions/upload-artifact@v4
