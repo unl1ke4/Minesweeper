@@ -13,7 +13,7 @@ def test_board_initialization():
     assert board.mines == 10
     assert len(board.mine_positions) == 10
 
-@pytest.parametrize("rows, cols, mines", [
+@pytest.mark.parametrize("rows, cols, mines", [
     (5, 5, 5),
     (10, 10, 10),
     (15, 15, 20)
