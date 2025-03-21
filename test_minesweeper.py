@@ -20,9 +20,8 @@ def test_board_initialization():
 ])
 
 def test_mine_placement():
-    board = GameBoard(10, 10, 10)
-    mine_count = sum(row.count(-1) for row in board.board)
-    assert mine_count == 10
+     mine_count = sum(row.count(-1) for row in sample_board.board)
+    assert mine_count == sample_board.mines
 
 @patch("minesweeper.random.sample")
 def test_mine_positions(mock_sample):
