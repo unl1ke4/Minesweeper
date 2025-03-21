@@ -6,8 +6,8 @@ from unittest.mock import patch
 def sample_board():
     return GameBoard(10, 10, 10)
 
-def test_board_initialization():
-    board = GameBoard(10, 10, 10)
+def test_board_initialization(sample_board):
+    board = sample_board
     assert board.rows == 10
     assert board.cols == 10
     assert board.mines == 10
@@ -20,8 +20,9 @@ def test_board_initialization():
 ])
 
 def test_mine_placement():
-     mine_count = sum(row.count(-1) for row in sample_board.board)
-    assert mine_count == sample_board.mines
+    board = GameBoard(rows, cols, mines)
+    mine_count = sum(row.count(-1) for row in board.board)
+    assert mine_count == mines
 
 @patch("minesweeper.random.sample")
 def test_mine_positions(mock_sample):
@@ -41,6 +42,3 @@ def test_number_calculation():
                 if (dr, dc) != (0, 0)
             )
             assert board.board[r][c] == adjacent_mines
-
-if __name__ == "__main__":
-    pytest.main()
