@@ -24,7 +24,7 @@ def test_mine_placement(rows, cols, mines):
     mine_count = sum(row.count(-1) for row in board.board)
     assert mine_count == mines
 
-@patch("minesweeper.random.sample")
+@patch("minesweeper.GameBoard.random.sample")
 def test_mine_positions(mock_sample):
     mock_sample.return_value = [(0, 0), (1, 1), (2, 2)]  # Фіксовані міни
     board = GameBoard(5, 5, 3)
