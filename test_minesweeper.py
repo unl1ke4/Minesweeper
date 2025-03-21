@@ -19,7 +19,7 @@ def test_board_initialization(sample_board):
     (15, 15, 20)
 ])
 
-def test_mine_placement():
+def test_mine_placement(rows, cols, mines):
     board = GameBoard(rows, cols, mines)
     mine_count = sum(row.count(-1) for row in board.board)
     assert mine_count == mines
